@@ -10,9 +10,11 @@ import java.time.LocalDateTime;
 public class DispatchResponseDto {
 
     private Long id;
-    private String orderNumber;
+    private String orderName;
+    private String description;
+    private String geologistName;
     private Long amount;
+    private String notes;
     private LocalDate dispatchDate;
-    private String note;
     private LocalDateTime createdAt;
 }

@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 public class ShipmentResponseDto {
 
     private Long id;
-    private String orderNumber;
+    private String orderName;
+    private String description;
+    private String geologistName;
     private Long amount;
-    private Boolean quality;
-    private String comment;
-    private LocalDate shippedAt;
+    private String notes;
+    private LocalDate shipmentDate;
     private LocalDateTime createdAt;
-
 }
 

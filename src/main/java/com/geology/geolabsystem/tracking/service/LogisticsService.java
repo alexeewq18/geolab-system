@@ -3,8 +3,11 @@ package com.geology.geolabsystem.tracking.service;
 import com.geology.geolabsystem.tracking.dto.request.DispatchRequestDto;
 import com.geology.geolabsystem.tracking.dto.response.DispatchResponseDto;
 import com.geology.geolabsystem.tracking.entity.DispatchEntity;
+import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
+import com.geology.geolabsystem.tracking.entity.enums.OrderStatus;
 import com.geology.geolabsystem.tracking.mapper.DispatchesMapper;
 import com.geology.geolabsystem.tracking.repository.DispatchesRepository;
+import com.geology.geolabsystem.tracking.repository.LabOrdersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,27 +22,30 @@ public class LogisticsService {
     private final DispatchesRepository dispatchesRepository;
     private final DispatchesMapper mapper;
     private final OrderControlService orderControlService;
+    private final LabOrdersRepository labOrdersRepository;
 
     @Transactional
     public DispatchResponseDto registerDispatch(DispatchRequestDto dto) {
 
-        String orderNumber = dto.getOrderNumber();
-        Long currentBalance = orderControlService.calculateBalance(orderNumber);
+        // 1. Найти заказ
+        LabOrderEntity order = labOrdersRepository.findByOrderName(dto.getOrderName())
+                .orElseThrow(() -> new RuntimeException("Заказ " + dto.getOrderName() + " не найден"));
 
-        if (currentBalance < dto.getAmount()) {
-            throw new RuntimeException(
-                    String.format("Недостаточно монолитов для отправки. Остаток: %d, попытка отправить: %d",
-                            currentBalance, dto.getAmount()));
+        // 2. Проверка баланса
+        if (order.getAmount() < dto.getAmount()) {
+            throw new RuntimeException(String.format("Недостаточно монолитов. Остаток: %d", order.getAmount()));
         }
 
+        // 3. МАГИЯ МАППЕРА: Создаем сущность в одну строку
         DispatchEntity entity = mapper.toEntity(dto);
-        entity.setCreatedAt(LocalDateTime.now());
-        DispatchEntity saved = dispatchesRepository.save(entity);
+        entity.setLabOrderEntity(order); // Привязываем заказ руками, так как это связь с БД
 
-        Long newBalance = orderControlService.calculateBalance(saved.getLabOrderEntity().getOrderName());
-        DispatchResponseDto response = mapper.toResponseDto(saved);
-        response.setAmount(newBalance);
-        return response;
+        // 4. Сохраняем и пересчитываем
+        DispatchEntity saved = dispatchesRepository.save(entity);
+        orderControlService.calculateBalance(dto.getOrderName());
+
+        // 5. МАГИЯ МАППЕРА: Возвращаем ответ
+        return mapper.toResponseDto(saved);
     }
 
     public List<DispatchResponseDto> getAllDispatch(String labOrder, String geologistName) {

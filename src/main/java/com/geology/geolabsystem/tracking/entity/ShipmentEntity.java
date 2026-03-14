@@ -3,6 +3,8 @@ package com.geology.geolabsystem.tracking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,28 +20,29 @@ public class ShipmentEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private LabOrderEntity labOrderEntity;
 
     @Column(name = "order_name", nullable = false)
     private String orderName;
 
-    @Column(name = "geologist_name")
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "geologist_name", nullable = false)
     private String geologistName;
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private Long amount;
 
-    @Column(nullable = false)
-    private Boolean quality = true;
-
     @Column(length = 500)
-    private String comment;
+    private String notes;
 
-    @Column(name = "shipped_at", nullable = false)
-    private LocalDate shippedAt = LocalDate.now();
+    @Column(name = "workDate", nullable = false, updatable = false)
+    private LocalDate shipmentDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

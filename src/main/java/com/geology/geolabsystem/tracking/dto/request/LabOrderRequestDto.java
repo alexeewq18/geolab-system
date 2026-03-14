@@ -1,25 +1,30 @@
 package com.geology.geolabsystem.tracking.dto.request;
 
-import com.geology.geolabsystem.tracking.entity.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Data
 public class LabOrderRequestDto {
 
-    @NotNull(message = "номер заказа обязателен")
-    private String orderNumber;
+    @NotNull(message = "Номер заказа обязателен")
+    private String orderName;
 
+    @NotNull(message = "Название объекта обязательно")
     private String description;
 
     @NotBlank(message = "Фамилия геолога обязательна")
     private String geologistName;
-    private OrderStatus status;
 
     @Min(value = 0, message = "Баланс не может быть отрицательным")
     private Long amount;
+
+    @NotNull(message = "Дата создания не может быть пустой")
+    @PastOrPresent(message = "Дата создания не может быть в будущем")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate workDate;
 }

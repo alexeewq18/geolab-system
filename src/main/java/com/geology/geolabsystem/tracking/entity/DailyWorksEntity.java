@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,18 +28,22 @@ public class DailyWorksEntity {
     @Column(name = "order_name", nullable = false)
     private String orderName;
 
-    @Column(name = "geologist_name")
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "geologist_name", nullable = false)
     private String geologistName;
 
-    @Column(nullable = false)
+    @Column(name = "amount", nullable = false)
     private Long amount;
 
-    @Column(name = "work_date", nullable = false)
-    private LocalDate workDate = LocalDate.now();
-
     @Column(length = 500)
-    private String note;
+    private String notes;
+
+    @Column(name = "workDate", nullable = false, updatable = false)
+    private LocalDate workDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt = LocalDateTime.now();
 }

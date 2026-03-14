@@ -3,6 +3,7 @@ package com.geology.geolabsystem.tracking.service;
 import com.geology.geolabsystem.tracking.dto.request.DailyWorksRequestDto;
 import com.geology.geolabsystem.tracking.dto.response.DailyWorksResponseDto;
 import com.geology.geolabsystem.tracking.entity.DailyWorksEntity;
+import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
 import com.geology.geolabsystem.tracking.mapper.DailyWorksMapper;
 import com.geology.geolabsystem.tracking.repository.DailyWorksRepository;
 import com.geology.geolabsystem.tracking.repository.LabOrdersRepository;
@@ -23,53 +24,59 @@ public class ProductionService {
     private final DailyWorksRepository dailyWorksRepository;
     private final DailyWorksMapper mapper;
     private final OrderControlService orderControlService;
+    private final LabOrdersRepository labOrdersRepository;
 
     @Transactional
     public DailyWorksResponseDto registerDailyWorks(DailyWorksRequestDto dto) {
+
+        // 1. Находим заказ
+        LabOrderEntity order = labOrdersRepository.findByOrderName(dto.getOrderName())
+                .orElseThrow(() -> new RuntimeException("Заказ " + dto.getOrderName() + " не найден"));
+
+        // 2. Маппим DTO в Entity и связываем
         DailyWorksEntity entity = mapper.toEntity(dto);
-        entity.setCreatedAt(LocalDateTime.now());
+        entity.setLabOrderEntity(order);
+
         DailyWorksEntity saved = dailyWorksRepository.save(entity);
 
-        Long newBalance = orderControlService.calculateBalance(saved.getLabOrderEntity().getOrderName());
-        DailyWorksResponseDto response = mapper.toResponseDto(saved);
-        response.setAmount(newBalance);
-        return response;
+        // 3. Пересчитываем баланс
+        orderControlService.calculateBalance(dto.getOrderName());
+
+        return mapper.toResponseDto(saved);
     }
 
     @Transactional
     public List<DailyWorksResponseDto>  registerAllDailyWorks(List<DailyWorksRequestDto> listDto) {
-        if (listDto == null || listDto.isEmpty()) {
-            System.out.println("Нет данных для сохранения");
-            return List.of();
+        if (listDto == null || listDto.isEmpty()) return List.of();
+
+        // Мы всё еще используем цикл, так как для каждой записи нужно найти заказ и пересчитать баланс
+        List<DailyWorksEntity> entitiesToSave = new ArrayList<>();
+
+        for (DailyWorksRequestDto dto : listDto) {
+            LabOrderEntity order = labOrdersRepository.findByOrderName(dto.getOrderName())
+                    .orElseThrow(() -> new RuntimeException("Заказ " + dto.getOrderName() + " не найден"));
+
+            DailyWorksEntity entity = mapper.toEntity(dto);
+            entity.setLabOrderEntity(order);
+            entitiesToSave.add(entity);
         }
 
-        List<DailyWorksResponseDto> results = new ArrayList<>();
+        List<DailyWorksEntity> savedEntities = dailyWorksRepository.saveAll(entitiesToSave);
 
-        for (DailyWorksRequestDto item : listDto) {
-            DailyWorksEntity entity = mapper.toEntity(item);
-            entity.setCreatedAt(LocalDateTime.now());
-            DailyWorksEntity saved = dailyWorksRepository.save(entity);
+        // Пересчитываем балансы (можно оптимизировать, чтобы не считать один и тот же заказ дважды)
+        listDto.stream()
+                .map(DailyWorksRequestDto::getOrderName)
+                .distinct()
+                .forEach(orderControlService::calculateBalance);
 
-            Long newBalance = orderControlService.calculateBalance(saved.getLabOrderEntity().getOrderName());
-
-            DailyWorksResponseDto response = mapper.toResponseDto(saved);
-            response.setAmount(newBalance);
-            results.add(response);
-        }
-        return results;
+        return mapper.toResponseDtoList(savedEntities);
     }
 
     public List<DailyWorksResponseDto> getWorksByDate (LocalDate date) {
-        return dailyWorksRepository.findByWorkDate(date)
-                .stream()
-                .map(mapper::toResponseDto)
-                .toList();
+        return mapper.toResponseDtoList(dailyWorksRepository.findByWorkDate(date));
     }
 
     public List<DailyWorksResponseDto> getAllDailyWorks(String orderName, String geologistName) {
-        return dailyWorksRepository.findAllByLabOrderEntity_OrderNameAndGeologistName(orderName, geologistName)
-                .stream()
-                .map(mapper::toResponseDto)
-                .toList();
+        return mapper.toResponseDtoList(dailyWorksRepository.findAll());
     }
 }
