@@ -1,6 +1,7 @@
 package com.geology.geolabsystem.tracking.dto.response;
 
 import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -11,9 +12,11 @@ import java.time.LocalDateTime;
 public class DailyWorksResponseDto {
 
     private Long id;
-    private String orderNumber;
+    private String orderName;
+    private String description;
+    private String geologistName;
     private Long amount;
-    private LocalDate workDate;
     private String note;
+    private LocalDate workDate;
     private LocalDateTime createdAt;
     }

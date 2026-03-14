@@ -27,17 +27,20 @@ public class DispatchEntity {
     @Column(name = "order_name", nullable = false)
     private String orderName;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "geologist_name")
     private String geologistName;
 
-    @Column(nullable = false)
+    @Column(name = "amount", nullable = false)
     private Long amount;
-
-    @Column(name = "dispatch_date", nullable = false)
-    private LocalDate dispatchDate;
 
     @Column(length = 500)
     private String note;
+
+    @Column(name = "workDate", nullable = false, updatable = false)
+    private LocalDate workDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

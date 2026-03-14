@@ -18,11 +18,14 @@ public class ShipmentEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private LabOrderEntity labOrderEntity;
 
     @Column(name = "order_name", nullable = false)
     private String orderName;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "geologist_name")
     private String geologistName;
@@ -30,14 +33,11 @@ public class ShipmentEntity {
     @Column(name = "amount")
     private Long amount;
 
-    @Column(nullable = false)
-    private Boolean quality = true;
-
     @Column(length = 500)
-    private String comment;
+    private String note;
 
-    @Column(name = "shipped_at", nullable = false)
-    private LocalDate shippedAt = LocalDate.now();
+    @Column(name = "workDate", nullable = false, updatable = false)
+    private LocalDate workDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

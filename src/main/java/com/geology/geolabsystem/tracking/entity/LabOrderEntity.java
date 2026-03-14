@@ -4,7 +4,7 @@ package com.geology.geolabsystem.tracking.entity;
 import com.geology.geolabsystem.tracking.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,14 +30,14 @@ public class LabOrderEntity {
     @Column(name="amount", nullable = false)
     private Long amount;
 
-    @Enumerated(EnumType.STRING) // Чтобы в БД было "LOCAL_PROCESSING", а не 1
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "workDate", nullable = false, updatable = false)
+    private LocalDate workDate;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 }
