@@ -12,7 +12,7 @@ import com.geology.geolabsystem.tracking.repository.ShipmentsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Service
@@ -29,11 +29,12 @@ public class OrderControlService {
     public LabOrderResponseDto createOrder(LabOrderRequestDto dto) {
 
         LabOrderEntity entity = mapper.toEntity(dto);
-        entity.setStatus(OrderStatus.CREATED);
-        entity.setCreatedAt(LocalDateTime.now());
 
-        LabOrderEntity saveOrder = labOrdersRepository.save(entity);
-        return mapper.toResponseDto(saveOrder);
+        entity.setStatus(OrderStatus.CREATED);
+        entity.setAmount(0L);
+
+        LabOrderEntity saved = labOrdersRepository.save(entity);
+        return mapper.toResponseDto(saved);
     }
 
     public List<LabOrderResponseDto> getAllOrders() {
@@ -52,23 +53,24 @@ public class OrderControlService {
 
     @Transactional
     public Long calculateBalance(String orderName) {
-
         Long totalShipped = shipmentsRepository.sumAmountByOrderName(orderName);
-        if (totalShipped == null) totalShipped = 0L;
-
         Long totalWorked = dailyWorksRepository.sumAmountByOrderName(orderName);
-        if (totalWorked == null) totalWorked = 0L;
-
         Long totalDispatched = dispatchesRepository.sumAmountByOrderName(orderName);
-        if (totalDispatched == null) totalDispatched = 0L;
 
         Long balance = totalShipped - totalWorked - totalDispatched;
 
         LabOrderEntity order = labOrdersRepository.findByOrderName(orderName)
-                .orElseThrow(() -> new RuntimeException("Заказ с номером " + orderName + " не найден"));
+                .orElseThrow(() -> new RuntimeException("Заказ " + orderName + " не найден"));
 
         order.setAmount(balance);
-        labOrdersRepository.save(order);
+
+        boolean hasOperations = (totalShipped > 0 || totalWorked > 0 || totalDispatched > 0);
+
+        if (balance == 0 && hasOperations) {
+            order.setStatus(OrderStatus.COMPLETED);
+        } else if (balance > 0) {
+            order.setStatus(OrderStatus.IN_PROGRESS);
+        }
 
         return balance;
     }

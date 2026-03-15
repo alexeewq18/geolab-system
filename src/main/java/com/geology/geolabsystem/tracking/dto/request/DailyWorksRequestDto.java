@@ -26,7 +26,7 @@ public class DailyWorksRequestDto {
     @Positive(message = "Количество должно быть больше 0")
     private Long amount;
 
-    private String note;
+    private String notes;
 
     @NotNull(message = "Дата создания не может быть пустой")
     @PastOrPresent(message = "Дата создания не может быть в будущем")

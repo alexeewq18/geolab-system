@@ -16,7 +16,7 @@ public class DailyWorksResponseDto {
     private String description;
     private String geologistName;
     private Long amount;
-    private String note;
+    private String notes;
     private LocalDate workDate;
     private LocalDateTime createdAt;
     }

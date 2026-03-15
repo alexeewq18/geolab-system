@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class DispatchRequestDto {
 
     @NotNull(message = "номер заказа обязателен")
-    private String orderNumber;
+    private String orderName;
 
     @NotNull(message = "Название объекта обязательно")
     private String description;
@@ -25,10 +25,10 @@ public class DispatchRequestDto {
     @Positive(message = "Количество должно быть больше 0")
     private Long amount;
 
-    private String note;
+    private String notes;
 
     @NotNull(message = "Дата создания не может быть пустой")
     @PastOrPresent(message = "Дата создания не может быть в будущем")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate workDate;
+    private LocalDate dispatchDate;
 }

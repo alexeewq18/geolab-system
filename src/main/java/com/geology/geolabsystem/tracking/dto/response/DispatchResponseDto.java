@@ -14,7 +14,7 @@ public class DispatchResponseDto {
     private String description;
     private String geologistName;
     private Long amount;
-    private String note;
-    private LocalDate workDate;
+    private String notes;
+    private LocalDate dispatchDate;
     private LocalDateTime createdAt;
 }

@@ -11,9 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface ShipmentsRepository extends JpaRepository<ShipmentEntity, Long> {
-    @Query("SELECT SUM(d.amount) FROM ShipmentEntity d " +
-            "JOIN d.labOrderEntity o " +
-            "WHERE o.orderName = :orderName")
+    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM ShipmentEntity s WHERE s.labOrderEntity.orderName = :orderName")
     Long sumAmountByOrderName(@Param("orderName") String orderName);
+
 
 }

@@ -11,9 +11,7 @@ import java.util.List;
 
 @Repository
 public interface DispatchesRepository extends JpaRepository<DispatchEntity, Long> {
-    @Query("SELECT SUM(d.amount) FROM DispatchEntity d " +
-            "JOIN d.labOrderEntity o " +
-            "WHERE o.orderName = :orderName")
+    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM ShipmentEntity s WHERE s.labOrderEntity.orderName = :orderName")
     Long sumAmountByOrderName(@Param("orderName") String orderName);
 
     List<DispatchEntity> findAllByLabOrderEntityOrderNameAndGeologistName (String labOrder, String geologistName);

@@ -14,12 +14,11 @@ import java.util.Optional;
 
 @Repository
 public interface DailyWorksRepository extends JpaRepository<DailyWorksEntity, Long> {
-    @Query("SELECT SUM(d.amount) FROM DailyWorksEntity d " +
-            "JOIN d.labOrderEntity o " +
-            "WHERE o.orderName = :orderName")
+
+    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM ShipmentEntity s WHERE s.labOrderEntity.orderName = :orderName")
     Long sumAmountByOrderName(@Param("orderName") String orderName);
 
-    List<DailyWorksEntity>  findByWorkDate(LocalDate date);
+    List<DailyWorksEntity> findByWorkDate(LocalDate date);
 
     List<DailyWorksEntity> findAllByLabOrderEntity_OrderNameAndGeologistName(String orderName, String geologositName);
 }

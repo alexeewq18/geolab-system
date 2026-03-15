@@ -14,8 +14,8 @@ public class ShipmentResponseDto {
     private String description;
     private String geologistName;
     private Long amount;
-    private String note;
-    private LocalDate workDate;
+    private String notes;
+    private LocalDate shipmentDate;
     private LocalDateTime createdAt;
 }
 
