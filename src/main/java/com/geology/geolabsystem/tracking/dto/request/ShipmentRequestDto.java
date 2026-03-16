@@ -2,6 +2,7 @@ package com.geology.geolabsystem.tracking.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;

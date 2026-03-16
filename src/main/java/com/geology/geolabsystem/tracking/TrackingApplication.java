@@ -1,4 +1,4 @@
-package com.geology.geolabsystem;
+package com.geology.geolabsystem.tracking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

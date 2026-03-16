@@ -23,23 +23,17 @@ public class ShipmentEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private LabOrderEntity labOrderEntity;
 
-    @Column(name = "order_name", nullable = false)
-    private String orderName;
-
-    @Column(name = "description", nullable = false)
-    private String description;
-
-    @Column(name = "geologist_name", nullable = false)
-    private String geologistName;
-
     @Column(name = "amount", nullable = false)
     private Long amount;
 
     @Column(length = 500)
     private String notes;
 
-    @Column(name = "workDate", nullable = false, updatable = false)
+    @Column(name = "shipment_date", nullable = false, updatable = false)
     private LocalDate shipmentDate;
+
+    @Column(name = "shipping_id")
+    private String shippingId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

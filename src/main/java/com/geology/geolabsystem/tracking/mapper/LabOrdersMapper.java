@@ -15,7 +15,7 @@ public interface LabOrdersMapper {
     LabOrderEntity toEntity(LabOrderRequestDto dto);
     LabOrderResponseDto toResponseDto(LabOrderEntity entity);
 
-    @Mapping(source = "orderName", target = "orderNumber")
+    @Mapping(source = "orderName", target = "orderName")
     LabOrderEntity toEntityFromShipment(ShipmentRequestDto dto);
 
 }

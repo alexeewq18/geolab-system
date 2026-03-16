@@ -4,6 +4,7 @@ package com.geology.geolabsystem.tracking.controller;
 import com.geology.geolabsystem.tracking.dto.request.LabOrderRequestDto;
 import com.geology.geolabsystem.tracking.dto.response.LabOrderResponseDto;
 import com.geology.geolabsystem.tracking.service.OrderControlService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class OrderController {
     private final OrderControlService orderControlService;
 
     @PostMapping
-    public ResponseEntity<LabOrderResponseDto> createOrder(@RequestBody LabOrderRequestDto dto) {
+    public ResponseEntity<LabOrderResponseDto> createOrder(@Valid @RequestBody LabOrderRequestDto dto) {
         LabOrderResponseDto response = orderControlService.createOrder(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -31,8 +32,19 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LabOrderResponseDto> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<LabOrderResponseDto> getOrderById(@Valid @PathVariable Long id) {
         LabOrderResponseDto order = orderControlService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/by-details")
+    public ResponseEntity<LabOrderResponseDto> getOrderByDetails(
+            @RequestParam String orderName,
+            @RequestParam String description,
+            @RequestParam String geologistName) {
+        LabOrderResponseDto order = orderControlService.getOrderByDetails(
+                orderName, description, geologistName
+        );
         return ResponseEntity.ok(order);
     }
 
@@ -40,7 +52,7 @@ public class OrderController {
     public ResponseEntity<List<LabOrderResponseDto>> getOrdersWithPositiveBalance() {
         List<LabOrderResponseDto> orders = orderControlService.getAllOrders()
                 .stream()
-                .filter(order -> order.getAmount() > 0)  // только с остатком
+                .filter(order -> order.getAmount() > 0)
                 .toList();
         return ResponseEntity.ok(orders);
     }

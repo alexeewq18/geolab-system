@@ -18,5 +18,6 @@ public class DailyWorksResponseDto {
     private Long amount;
     private String notes;
     private LocalDate workDate;
+    private String workDayId;
     private LocalDateTime createdAt;
     }

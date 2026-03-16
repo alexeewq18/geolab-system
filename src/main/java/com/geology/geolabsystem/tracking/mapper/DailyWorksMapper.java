@@ -21,7 +21,6 @@ public interface DailyWorksMapper {
     @Mapping(source = "labOrderEntity.geologistName", target = "geologistName")
     DailyWorksResponseDto toResponseDto (DailyWorksEntity entity);
 
-    // Магия MapStruct: маппинг списков создается одной строчкой!
     List<DailyWorksResponseDto> toResponseDtoList(List<DailyWorksEntity> entities);
 
 }

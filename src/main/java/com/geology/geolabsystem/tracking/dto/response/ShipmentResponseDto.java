@@ -1,6 +1,7 @@
 package com.geology.geolabsystem.tracking.dto.response;
 
 import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ public class ShipmentResponseDto {
     private Long amount;
     private String notes;
     private LocalDate shipmentDate;
+    private String shippingId;
     private LocalDateTime createdAt;
 }
 

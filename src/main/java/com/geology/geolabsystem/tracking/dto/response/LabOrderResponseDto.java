@@ -15,6 +15,5 @@ public class LabOrderResponseDto {
     private String geologistName;
     private Long amount;
     private OrderStatus status;
-    private LocalDate workDate;
     private LocalDateTime createdAt;
 }

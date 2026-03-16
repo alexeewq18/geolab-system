@@ -4,21 +4,24 @@ import com.geology.geolabsystem.tracking.dto.request.DailyWorksRequestDto;
 import com.geology.geolabsystem.tracking.dto.response.DailyWorksResponseDto;
 import com.geology.geolabsystem.tracking.entity.DailyWorksEntity;
 import com.geology.geolabsystem.tracking.entity.LabOrderEntity;
+import com.geology.geolabsystem.tracking.exception.OrderNotFoundException;
 import com.geology.geolabsystem.tracking.mapper.DailyWorksMapper;
 import com.geology.geolabsystem.tracking.repository.DailyWorksRepository;
 import com.geology.geolabsystem.tracking.repository.LabOrdersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductionService {
 
     private final DailyWorksRepository dailyWorksRepository;
@@ -27,47 +30,43 @@ public class ProductionService {
     private final LabOrdersRepository labOrdersRepository;
 
     @Transactional
-    public DailyWorksResponseDto registerDailyWorks(DailyWorksRequestDto dto) {
-
-        // 1. Находим заказ
-        LabOrderEntity order = labOrdersRepository.findByOrderName(dto.getOrderName())
-                .orElseThrow(() -> new RuntimeException("Заказ " + dto.getOrderName() + " не найден"));
-
-        // 2. Маппим DTO в Entity и связываем
-        DailyWorksEntity entity = mapper.toEntity(dto);
-        entity.setLabOrderEntity(order);
-
-        DailyWorksEntity saved = dailyWorksRepository.save(entity);
-
-        // 3. Пересчитываем баланс
-        orderControlService.calculateBalance(dto.getOrderName());
-
-        return mapper.toResponseDto(saved);
-    }
-
-    @Transactional
-    public List<DailyWorksResponseDto>  registerAllDailyWorks(List<DailyWorksRequestDto> listDto) {
+    public List<DailyWorksResponseDto> registerDailyWorks(List<DailyWorksRequestDto> listDto) {
         if (listDto == null || listDto.isEmpty()) return List.of();
 
-        // Мы всё еще используем цикл, так как для каждой записи нужно найти заказ и пересчитать баланс
         List<DailyWorksEntity> entitiesToSave = new ArrayList<>();
+        Set<LabOrderEntity> ordersToRecalculate = new HashSet<>();
 
+        String currentWorkDayId = java.util.UUID.randomUUID().toString();
         for (DailyWorksRequestDto dto : listDto) {
-            LabOrderEntity order = labOrdersRepository.findByOrderName(dto.getOrderName())
-                    .orElseThrow(() -> new RuntimeException("Заказ " + dto.getOrderName() + " не найден"));
+            LabOrderEntity order = labOrdersRepository.findByOrderNameAndDescriptionAndGeologistName(
+                            dto.getOrderName(),
+                            dto.getDescription(),
+                            dto.getGeologistName()
+                    )
+                    .orElseThrow(() -> new OrderNotFoundException(
+                            "Ошибка фиксации работ! ",
+                            dto.getOrderName(),
+                            dto.getDescription(),
+                            dto.getGeologistName()
+                    ));
 
             DailyWorksEntity entity = mapper.toEntity(dto);
             entity.setLabOrderEntity(order);
+            entity.setWorkDayId(currentWorkDayId);
             entitiesToSave.add(entity);
+
+            ordersToRecalculate.add(order);
         }
 
         List<DailyWorksEntity> savedEntities = dailyWorksRepository.saveAll(entitiesToSave);
 
-        // Пересчитываем балансы (можно оптимизировать, чтобы не считать один и тот же заказ дважды)
-        listDto.stream()
-                .map(DailyWorksRequestDto::getOrderName)
-                .distinct()
-                .forEach(orderControlService::calculateBalance);
+        ordersToRecalculate.forEach(order ->
+                orderControlService.calculateBalance(
+                        order.getOrderName(),
+                        order.getDescription(),
+                        order.getGeologistName()
+                )
+        );
 
         return mapper.toResponseDtoList(savedEntities);
     }
@@ -76,7 +75,7 @@ public class ProductionService {
         return mapper.toResponseDtoList(dailyWorksRepository.findByWorkDate(date));
     }
 
-    public List<DailyWorksResponseDto> getAllDailyWorks(String orderName, String geologistName) {
+    public List<DailyWorksResponseDto> getAllDailyWorks() {
         return mapper.toResponseDtoList(dailyWorksRepository.findAll());
     }
 }

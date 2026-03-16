@@ -22,9 +22,4 @@ public class LabOrderRequestDto {
 
     @Min(value = 0, message = "Баланс не может быть отрицательным")
     private Long amount;
-
-    @NotNull(message = "Дата создания не может быть пустой")
-    @PastOrPresent(message = "Дата создания не может быть в будущем")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate workDate;
 }

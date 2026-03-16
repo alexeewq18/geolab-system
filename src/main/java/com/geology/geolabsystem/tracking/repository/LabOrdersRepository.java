@@ -14,9 +14,6 @@ import java.util.Optional;
 @Repository
 public interface LabOrdersRepository extends JpaRepository<LabOrderEntity, Long> {
 
-    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM ShipmentEntity s WHERE s.labOrderEntity.orderName = :orderName")
-    Long sumAmountByOrderName(@Param("orderName") String orderName);
-
-    Optional <LabOrderEntity> findByOrderName(String orderName);
+    Optional <LabOrderEntity> findByOrderNameAndDescriptionAndGeologistName(String orderName, String description, String geologistName);
 
 }
