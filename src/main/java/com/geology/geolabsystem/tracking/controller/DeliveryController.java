@@ -1,6 +1,5 @@
 package com.geology.geolabsystem.tracking.controller;
 
-
 import com.geology.geolabsystem.tracking.dto.request.DispatchRequestDto;
 import com.geology.geolabsystem.tracking.dto.response.DispatchResponseDto;
 import com.geology.geolabsystem.tracking.service.DeliveryService;
@@ -24,14 +23,14 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @PostMapping
-    @PreAuthorize("hasRole('HEAD')")
+    @PreAuthorize("hasRole('TEAM_LEAD')")
     public ResponseEntity<List<DispatchResponseDto>> registerDispatches(@Valid @RequestBody List<DispatchRequestDto> dtos) {
         List<DispatchResponseDto> responses = deliveryService.registerDispatches(dtos);
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Page<DispatchResponseDto>> getDispatches(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         Page<DispatchResponseDto> dispatch = deliveryService.getAllDispatch(pageable);
@@ -39,7 +38,7 @@ public class DeliveryController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<DispatchResponseDto> getDispatchById(@Valid @PathVariable Long id) {
         DispatchResponseDto order = deliveryService.getDispatchById(id);
         return ResponseEntity.ok(order);

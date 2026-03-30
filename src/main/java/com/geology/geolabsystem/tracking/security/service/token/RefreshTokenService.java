@@ -34,6 +34,7 @@ public class RefreshTokenService {
                 .user(user)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(LocalDateTime.now().plus(Duration.ofMillis(refreshTokenDurationMs)))
+                .revoked(false)
                 .build();
 
         return refreshTokenRepository.save(refreshToken);
@@ -42,7 +43,8 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token was expired. Please make a new signin request");
+            throw new RuntimeException("Срок действия токена обновления истек. " +
+                    "Пожалуйста, отправьте новый запрос на вход.");
         }
         return token;
     }

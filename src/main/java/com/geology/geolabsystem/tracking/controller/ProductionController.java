@@ -33,7 +33,7 @@ public class ProductionController {
     }
 
     @GetMapping("/by-date")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<List<DailyWorksResponseDto>> getWorksByDate(
             @Valid @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<DailyWorksResponseDto> works = productionService.getWorksByDate(date);
@@ -41,7 +41,7 @@ public class ProductionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Page<DailyWorksResponseDto>> getAllDailyWorks(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         Page<DailyWorksResponseDto> works = productionService.getAllDailyWorks(pageable);

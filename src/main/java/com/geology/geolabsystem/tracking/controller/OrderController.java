@@ -22,28 +22,28 @@ public class OrderController {
     private final OrderControlService orderControlService;
 
     @PostMapping
-    @PreAuthorize("hasRole('WORKER')")
+    @PreAuthorize("hasRole('TEAM_LEAD')")
     public ResponseEntity<LabOrderResponseDto> createOrder(@Valid @RequestBody LabOrderRequestDto dto) {
         LabOrderResponseDto response = orderControlService.createOrder(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Page<LabOrderResponseDto>> getAllOrders(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         return ResponseEntity.ok(orderControlService.getAllOrders(pageable));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<LabOrderResponseDto> getOrderById(@Valid @PathVariable Long id) {
         LabOrderResponseDto order = orderControlService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 
     @GetMapping("/by-details")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<LabOrderResponseDto> getOrderByDetails(
             @RequestParam String orderName,
             @RequestParam String description,
@@ -55,14 +55,14 @@ public class OrderController {
     }
 
     @GetMapping("/with-balance")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Page<LabOrderResponseDto>> getOrdersWithPositiveBalance(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         return ResponseEntity.ok(orderControlService.getOrdersWithPositiveBalance(pageable));
     }
 
     @GetMapping("/summary")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<OrderSummaryResponseDto> getSummary() {
         return ResponseEntity.ok(orderControlService.getSummary());
     }

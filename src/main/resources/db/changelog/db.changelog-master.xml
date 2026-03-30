@@ -29,4 +29,9 @@
         <sqlFile path="db/changelog/sql/user_roles.sql"/>
     </changeSet>
 
+    <changeSet id="7" author="Alexeewq18">
+        <sqlFile path="db/changelog/sql/refresh_tokens.sql"/>
+    </changeSet>
+
+
 </databaseChangeLog>

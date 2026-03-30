@@ -41,6 +41,6 @@ public class LabOrderEntity {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
 }

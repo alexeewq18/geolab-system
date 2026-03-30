@@ -23,7 +23,7 @@ public class ReceptionController {
     private final ReceptionService receptionService;
 
     @PostMapping
-    @PreAuthorize("hasRole('HEAD')")
+    @PreAuthorize("hasRole('TEAM_LEAD')")
     public ResponseEntity<List<ShipmentResponseDto>> registerShipments(
             @Valid @RequestBody List<ShipmentRequestDto> dtos) {
         List<ShipmentResponseDto> response = receptionService.registerShipments(dtos);
@@ -31,7 +31,7 @@ public class ReceptionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Page<ShipmentResponseDto>> getAllShipments(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         Page<ShipmentResponseDto> shipments = receptionService.getAllShipments(pageable);
@@ -39,7 +39,7 @@ public class ReceptionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('CHIEF')")
+    @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<ShipmentResponseDto> getShipmentById(
             @Valid @PathVariable Long id) {
         ShipmentResponseDto shipment = receptionService.getShipmentsById(id);
